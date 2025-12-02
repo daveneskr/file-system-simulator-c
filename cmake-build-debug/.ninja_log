@@ -1,0 +1,5 @@
+# ninja log v6
+2	158	1761692960338684595	CMakeFiles/untitled.dir/main.c.o	1e72163abe1bede0
+3	158	1761692960339316471	CMakeFiles/untitled.dir/FileManagement.c.o	81ec44edda463d7a
+3	164	1761692791839298097	CMakeFiles/untitled.dir/FileSystemStructure.c.o	f24ecc00ba990ef1
+158	257	1761692960494857268	untitled	5a7c68325b4643fd
