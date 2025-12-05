@@ -1,4 +1,4 @@
-# 💾 File System Simulator (C) 
+# File System Simulator (C) 
 **CURRENTLY WORKING ON**
 
 A **UNIX-style file system simulator** implemented in C.  
@@ -6,7 +6,7 @@ This project replicates basic file system operations like **creating, reading, w
 
 ---
 
-## 🚀 Features
+## Features
 - Create, rename, and delete files/directories.
 - Navigate directories (`cd`, `ls`, etc.).
 - Simulate hierarchical directory structure.
@@ -15,7 +15,7 @@ This project replicates basic file system operations like **creating, reading, w
 
 ---
 
-## 💡 Motivation
+## Motivation
 Built to deepen understanding of:
 - File system design principles.
 - Pointer-based data structures (trees).
@@ -23,7 +23,7 @@ Built to deepen understanding of:
 
 ---
 
-## 🧠 Core Concepts
+## Core Concepts
 - **Tree structure** to represent directories.
 - **Recursion** for navigation and display.
 - **Linked lists** for files within directories.
@@ -31,6 +31,6 @@ Built to deepen understanding of:
 
 ---
 
-## 👨‍💻 Author
+## Author
 David Neskrabal
 Undergraduate Computer Science Student @ University College Dublin
