@@ -51,7 +51,7 @@ build cmake_object_order_depends_target_untitled: phony || .
 
 build CMakeFiles/untitled.dir/main.c.o: C_COMPILER__untitled_unscanned_Debug /Users/davidneskrabal/CLionProjects/File-System-Similator/main.c || cmake_object_order_depends_target_untitled
   DEP_FILE = CMakeFiles/untitled.dir/main.c.o.d
-  FLAGS = -g -std=gnu11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -mmacosx-version-min=26.0 -fcolor-diagnostics
+  FLAGS = -g -std=gnu11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -mmacosx-version-min=26.0 -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/untitled.dir
   OBJECT_FILE_DIR = CMakeFiles/untitled.dir
   TARGET_COMPILE_PDB = CMakeFiles/untitled.dir/
@@ -59,7 +59,7 @@ build CMakeFiles/untitled.dir/main.c.o: C_COMPILER__untitled_unscanned_Debug /Us
 
 build CMakeFiles/untitled.dir/FileSystemStructure.c.o: C_COMPILER__untitled_unscanned_Debug /Users/davidneskrabal/CLionProjects/File-System-Similator/FileSystemStructure.c || cmake_object_order_depends_target_untitled
   DEP_FILE = CMakeFiles/untitled.dir/FileSystemStructure.c.o.d
-  FLAGS = -g -std=gnu11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -mmacosx-version-min=26.0 -fcolor-diagnostics
+  FLAGS = -g -std=gnu11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -mmacosx-version-min=26.0 -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/untitled.dir
   OBJECT_FILE_DIR = CMakeFiles/untitled.dir
   TARGET_COMPILE_PDB = CMakeFiles/untitled.dir/
@@ -67,7 +67,7 @@ build CMakeFiles/untitled.dir/FileSystemStructure.c.o: C_COMPILER__untitled_unsc
 
 build CMakeFiles/untitled.dir/FileManagement.c.o: C_COMPILER__untitled_unscanned_Debug /Users/davidneskrabal/CLionProjects/File-System-Similator/FileManagement.c || cmake_object_order_depends_target_untitled
   DEP_FILE = CMakeFiles/untitled.dir/FileManagement.c.o.d
-  FLAGS = -g -std=gnu11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -mmacosx-version-min=26.0 -fcolor-diagnostics
+  FLAGS = -g -std=gnu11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -mmacosx-version-min=26.0 -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/untitled.dir
   OBJECT_FILE_DIR = CMakeFiles/untitled.dir
   TARGET_COMPILE_PDB = CMakeFiles/untitled.dir/
@@ -82,7 +82,7 @@ build CMakeFiles/untitled.dir/FileManagement.c.o: C_COMPILER__untitled_unscanned
 # Link the executable untitled
 
 build untitled: C_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.c.o CMakeFiles/untitled.dir/FileSystemStructure.c.o CMakeFiles/untitled.dir/FileManagement.c.o
-  FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -mmacosx-version-min=26.0
+  FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -mmacosx-version-min=26.0
   OBJECT_DIR = CMakeFiles/untitled.dir
   POST_BUILD = :
   PRE_LINK = :

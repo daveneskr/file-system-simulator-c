@@ -17,7 +17,8 @@ void write_block(uint32_t block_num, const void *buf) {
 }
 
 void sync_superblock() {
-    write_block(0, disk);
+    fseek(disk, 0, SEEK_SET);
+    fwrite(&sb, sizeof(sb), 1, disk);
 }
 
 int alloc_block() {
