@@ -2,8 +2,10 @@
 // Created by David Neškrabal on 28.10.2025.
 //
 
-#include "FileManagement.h"
+#include <time.h>
+#include <string.h>
 
+#include "FileManagement.h"
 #include "FileSystemStructure.h"
 
 void read_block(uint32_t block_num, void *buf) {
@@ -55,4 +57,26 @@ void free_inode(int i) {
     inode_bitmap[i] = 0;
     sb.free_inodes += 1;
     sync_superblock();
+}
+
+int create_inode(uint16_t mode)
+{
+    int inode_num = alloc_inode();
+    if (inode_num == -1)
+    {
+        return -1;
+    }
+    Inode new_inode;
+    memset(&new_inode, 0, sizeof(Inode));
+
+    new_inode.mode = mode;
+
+    uint32_t now = time(NULL);
+    new_inode.atime = now;
+    new_inode.mtime = now;
+    new_inode.ctime = now;
+
+    inode_table[inode_num] = new_inode;
+
+    return inode_num;
 }

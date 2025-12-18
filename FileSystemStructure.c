@@ -22,7 +22,7 @@ void format_disk(const char *filename, uint32_t num_blocks) {
     sb.total_blocks = num_blocks;
     sb.block_size = BLOCK_SIZE;
     sb.total_inodes = MAX_INODES;
-    sb.free_blocks = num_blocks - 7;   // for example: first 10 reserved
+    sb.free_blocks = num_blocks - 7;    // 7 reserved
     sb.free_inodes = MAX_INODES - 1;    // root inode used
     sb.root_inode = 0;
     sb.inode_start = 2;

@@ -27,11 +27,17 @@ typedef struct
 
 #define DIRECT_PTRS 12
 
+// Inode modes
+#define IREG  0x8000   // regular file
+#define IDIR  0x4000   // directory
+
+#define IRUSR 0x0100   // owner read
+#define IWUSR 0x0080   // owner write
+#define IXUSR 0x0040   // owner execute
+
 typedef struct {
     uint16_t mode;              // permissions / type
     uint16_t links_count;
-    uint32_t uid;
-    uint32_t gid;
     uint32_t size;              // in bytes
     uint32_t atime;
     uint32_t mtime;
@@ -54,10 +60,12 @@ Superblock sb;
 
 void format_disk(const char *filename, uint32_t num_blocks);
 
-void initialize_bitmap();
-
 uint8_t block_bitmap[BLOCK_SIZE];
-uint8_t inode_bitmap[BLOCK_SIZE];
+uint8_t inode_bitmap[MAX_INODES];
+
+Inode inode_table[MAX_INODES];
+
+void initialize_bitmap();
 
 typedef struct {
     Superblock sb;

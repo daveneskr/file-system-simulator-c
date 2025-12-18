@@ -14,8 +14,10 @@ int alloc_block();
 
 int alloc_inode();
 
-void free_block(int b);
+void free_block(uint32_t b);
 
-void free_inode(int i);
+void free_inode(uint32_t i);
+
+uint32_t create_inode();
 
 #endif //FILEMANAGEMENT_H
