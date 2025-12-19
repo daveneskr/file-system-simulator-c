@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #define BLOCK_SIZE 4096
-#define MAX_INODES 64
+#define MAX_INODES 512
 
 typedef struct
 {
@@ -63,8 +63,6 @@ void format_disk(const char *filename, uint32_t num_blocks);
 uint8_t block_bitmap[BLOCK_SIZE];
 uint8_t inode_bitmap[MAX_INODES];
 
-Inode inode_table[MAX_INODES];
-
 void initialize_bitmap();
 
 typedef struct {
@@ -72,5 +70,9 @@ typedef struct {
     FILE *disk;
     char mounted;
 } FileSystem;
+
+int update_inode_bitmap(uint32_t inode_num, uint8_t used);
+
+int update_block_bitmap(uint32_t block_num, uint8_t used);
 
 #endif //FILESYSTEMSTRUCTURE_H

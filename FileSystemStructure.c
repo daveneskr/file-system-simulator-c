@@ -5,6 +5,8 @@
 
 #include <stdlib.h>
 
+#include "FileManagement.h"
+
 void format_disk(const char *filename, uint32_t num_blocks) {
     disk = fopen(filename, "wb");
     if (!disk) {
@@ -25,8 +27,10 @@ void format_disk(const char *filename, uint32_t num_blocks) {
     sb.free_blocks = num_blocks - 7;    // 7 reserved
     sb.free_inodes = MAX_INODES - 1;    // root inode used
     sb.root_inode = 0;
-    sb.inode_start = 2;
-    sb.data_block_start = 10;
+    sb.block_bitmap_start = 1;
+    sb.inode_bitmap_start = 2;
+    sb.inode_start = 3;
+    sb.data_block_start = 6;
 
     // Step 3: write superblock at block 0
     fseek(disk, 0, SEEK_SET);
@@ -34,15 +38,37 @@ void format_disk(const char *filename, uint32_t num_blocks) {
 
     initialize_bitmap();
 
+    uint32_t root_ino = create_inode(IDIR | IRUSR | IWUSR | IXUSR);
+
     printf("Disk formatted: %s (%u blocks)\n", filename, num_blocks);
 }
 
 void initialize_bitmap() {
-    block_bitmap[0] = 1; // superblock
-    block_bitmap[1] = 1; // block bitmap space
-    block_bitmap[2] = 1; // inode bitmap space
-    block_bitmap[3] = 1; // inode table space 1/4
-    block_bitmap[4] = 1;
-    block_bitmap[5] = 1;
-    block_bitmap[6] = 1; // inode table space 4/4
+    update_block_bitmap(0, 1); // superblock
+    update_block_bitmap(1, 1); // block bitmap space
+    update_block_bitmap(2, 1); // inode bitmap space
+    update_block_bitmap(3, 1); // inode table space 1/4
+    update_block_bitmap(4, 1);
+    update_block_bitmap(5, 1);
+    update_block_bitmap(6, 1); // inode table space 4/4
+}
+
+int update_inode_bitmap(uint32_t inode_num, uint8_t used) {
+    inode_bitmap[inode_num] = used;
+    uint32_t offset = sb.inode_bitmap_start * BLOCK_SIZE + inode_num;
+
+    fseek(disk, offset, SEEK_SET);
+    fwrite(&used, 1, 1, disk);
+
+    return 0;
+}
+
+int update_block_bitmap(uint32_t block_num, uint8_t used) {
+    inode_bitmap[block_num] = used;
+    uint32_t offset = sb.block_bitmap_start * BLOCK_SIZE + block_num;
+
+    fseek(disk, offset, SEEK_SET);
+    fwrite(&used, 1, 1, disk);
+
+    return 0;
 }

@@ -26,7 +26,7 @@ void sync_superblock() {
 int alloc_block() {
     for (int i = 0; i < sb.total_blocks; i++) {
         if (block_bitmap[i] == 0) {
-            block_bitmap[i] = 1;
+            update_block_bitmap(i , 1);
             sb.free_blocks -= 1;
             sync_superblock();
             return i;
@@ -38,7 +38,7 @@ int alloc_block() {
 int alloc_inode() {
     for (int i = 0; i < sb.total_inodes; i++) {
         if (inode_bitmap[i] == 0) {
-            inode_bitmap[i] = 1;
+            update_inode_bitmap(i, 1);
             sb.free_inodes -= 1;
             sync_superblock();
             return i;
@@ -47,24 +47,24 @@ int alloc_inode() {
     return -1;
 }
 
-void free_block(int b) {
+void free_block(uint32_t b) {
     block_bitmap[b] = 0;
     sb.free_blocks += 1;
     sync_superblock();
 }
 
-void free_inode(int i) {
+void free_inode(uint32_t i) {
     inode_bitmap[i] = 0;
     sb.free_inodes += 1;
     sync_superblock();
 }
 
-int create_inode(uint16_t mode)
+uint32_t create_inode(uint16_t mode)
 {
     int inode_num = alloc_inode();
     if (inode_num == -1)
     {
-        return -1;
+        return 0;
     }
     Inode new_inode;
     memset(&new_inode, 0, sizeof(Inode));
@@ -76,7 +76,36 @@ int create_inode(uint16_t mode)
     new_inode.mtime = now;
     new_inode.ctime = now;
 
-    inode_table[inode_num] = new_inode;
+    write_inode(inode_num, &new_inode);
 
     return inode_num;
+}
+
+int write_inode(uint32_t inode_num, Inode *new_inode) {
+    int inode_per_block = BLOCK_SIZE / sizeof(Inode);
+
+    uint32_t inode_idx = inode_num % inode_per_block;
+    uint32_t block_idx = inode_num / inode_per_block + sb.inode_start;
+
+    uint32_t offset = block_idx * BLOCK_SIZE + inode_idx * sizeof(Inode);
+
+    fseek(disk, offset, SEEK_SET);
+    fwrite(new_inode, sizeof(Inode), 1, disk);
+
+    return 0;
+}
+
+int read_inode(uint32_t inode_num, Inode *out_inode) {
+
+    int inode_per_block = BLOCK_SIZE / sizeof(Inode);
+
+    uint32_t inode_idx = inode_num % inode_per_block;
+    uint32_t block_idx = inode_num / inode_per_block + sb.inode_start;
+
+    uint32_t offset = block_idx * BLOCK_SIZE + inode_idx * sizeof(Inode);
+
+    fseek(disk, offset, SEEK_SET);
+    fread(&out_inode, sizeof(Inode), 1, disk);
+
+    return 0;
 }
