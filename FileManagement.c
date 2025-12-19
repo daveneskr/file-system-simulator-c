@@ -24,7 +24,7 @@ void sync_superblock() {
 }
 
 int alloc_block() {
-    for (int i = 0; i < sb.total_blocks; i++) {
+    for (int i = sb.data_block_start; i < sb.total_blocks; i++) {
         if (block_bitmap[i] == 0) {
             update_block_bitmap(i , 1);
             sb.free_blocks -= 1;
@@ -96,7 +96,6 @@ int write_inode(uint32_t inode_num, Inode *new_inode) {
 }
 
 int read_inode(uint32_t inode_num, Inode *out_inode) {
-
     int inode_per_block = BLOCK_SIZE / sizeof(Inode);
 
     uint32_t inode_idx = inode_num % inode_per_block;
@@ -105,7 +104,7 @@ int read_inode(uint32_t inode_num, Inode *out_inode) {
     uint32_t offset = block_idx * BLOCK_SIZE + inode_idx * sizeof(Inode);
 
     fseek(disk, offset, SEEK_SET);
-    fread(&out_inode, sizeof(Inode), 1, disk);
+    fread(out_inode, sizeof(Inode), 1, disk);
 
     return 0;
 }

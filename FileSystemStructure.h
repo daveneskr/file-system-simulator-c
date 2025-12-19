@@ -48,13 +48,6 @@ typedef struct {
     uint32_t double_indirect;       // double indirect
 } Inode;
 
-#define NAME_MAX 64
-
-typedef struct {
-    uint32_t inode_num;
-    char name[NAME_MAX];
-} DirEntry;
-
 FILE *disk;  // your "virtual disk" file
 Superblock sb;
 

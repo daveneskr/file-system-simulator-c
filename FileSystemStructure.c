@@ -8,7 +8,7 @@
 #include "FileManagement.h"
 
 void format_disk(const char *filename, uint32_t num_blocks) {
-    disk = fopen(filename, "wb");
+    disk = fopen(filename, "wb+");
     if (!disk) {
         perror("fopen");
         exit(1);
@@ -38,7 +38,8 @@ void format_disk(const char *filename, uint32_t num_blocks) {
 
     initialize_bitmap();
 
-    uint32_t root_ino = create_inode(IDIR | IRUSR | IWUSR | IXUSR);
+    // IDIR | IRUSR | IWUSR | IXUSR
+    uint32_t root_ino = create_inode(1);
 
     printf("Disk formatted: %s (%u blocks)\n", filename, num_blocks);
 }
@@ -64,7 +65,7 @@ int update_inode_bitmap(uint32_t inode_num, uint8_t used) {
 }
 
 int update_block_bitmap(uint32_t block_num, uint8_t used) {
-    inode_bitmap[block_num] = used;
+    block_bitmap[block_num] = used;
     uint32_t offset = sb.block_bitmap_start * BLOCK_SIZE + block_num;
 
     fseek(disk, offset, SEEK_SET);

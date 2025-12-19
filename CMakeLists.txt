@@ -8,4 +8,6 @@ add_executable(untitled main.c
         FileSystemStructure.c
         FileManagement.c
         FileManagement.h
+        Directories.c
+        Directories.h
 )
