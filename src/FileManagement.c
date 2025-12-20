@@ -2,11 +2,10 @@
 // Created by David Neškrabal on 28.10.2025.
 //
 
+#include "../include/FileManagement.h"
+
 #include <time.h>
 #include <string.h>
-
-#include "FileManagement.h"
-#include "FileSystemStructure.h"
 
 void read_block(uint32_t block_num, void *buf) {
     fseek(disk, block_num * BLOCK_SIZE, SEEK_SET);

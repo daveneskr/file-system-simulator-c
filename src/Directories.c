@@ -2,11 +2,10 @@
 // Created by David Neškrabal on 19.12.2025.
 //
 
-#include "Directories.h"
+#include "../include/Directories.h"
+#include "../include/FileManagement.h"
 
 #include <string.h>
-
-#include "FileManagement.h"
 
 long dir_lookup(uint32_t dir_num, char *entry_name) {
     Inode dir;

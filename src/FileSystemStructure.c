@@ -1,11 +1,10 @@
 //
 // Created by David Neškrabal on 28.10.2025.
 //
-#include "FileSystemStructure.h"
+#include "../include/FileSystemStructure.h"
+#include "../include/FileManagement.h"
 
 #include <stdlib.h>
-
-#include "FileManagement.h"
 
 void format_disk(const char *filename, uint32_t num_blocks) {
     disk = fopen(filename, "wb+");
