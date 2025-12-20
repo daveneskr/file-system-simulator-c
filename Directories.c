@@ -12,8 +12,6 @@ long dir_lookup(uint32_t dir_num, char *entry_name) {
     Inode dir;
     read_inode(dir_num, &dir);
 
-    if (!(dir.mode & IDIR)) return -1;
-
     // find each block
     for (uint32_t i = 0; i < DIRECT_PTRS; i++) {
         uint32_t block_num = dir.direct[i];

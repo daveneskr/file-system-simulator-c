@@ -8,6 +8,6 @@
 
 int main(void) {
     format_disk("FS.bin", 10);
-
+    test_dir_lookup();
     fclose(disk);
 }

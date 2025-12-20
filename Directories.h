@@ -7,6 +7,8 @@
 #include "FileSystemStructure.h"
 #include <stdint.h>
 
+#define IFMT 0xF000
+
 #define NAME_MAX 32
 
 typedef struct {
@@ -15,5 +17,7 @@ typedef struct {
 } DirEntry;
 
 long dir_lookup(uint32_t dir_num, char *entry_name);
+
+void test_dir_lookup();
 
 #endif //DIRECTORIES_H
