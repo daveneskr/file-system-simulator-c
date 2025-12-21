@@ -4,11 +4,10 @@
 
 #ifndef FILESYSTEMSTRUCTURE_H
 #define FILESYSTEMSTRUCTURE_H
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
-#define BLOCK_SIZE 4096
+#define BLOCK_SIZE 4096 // in bytes
 #define MAX_INODES 512
 
 typedef struct
@@ -18,14 +17,14 @@ typedef struct
     uint32_t free_inodes;
     uint32_t free_blocks;
     uint32_t block_size;
-    uint32_t inode_start;
-    uint32_t block_bitmap_start;
-    uint32_t inode_bitmap_start;
-    uint32_t data_block_start;
-    uint32_t root_inode;
+    uint32_t inode_start;           // block number where inode table starts
+    uint32_t block_bitmap_start;    // block number where block bitmap is located
+    uint32_t inode_bitmap_start;    // block number where inode bitmap is located
+    uint32_t data_block_start;      // block number where data starts
+    uint32_t root_inode;            // inode number of the root inode
 } Superblock;
 
-#define DIRECT_PTRS 12
+#define DIRECT_PTRS 12  // number of direct pointers an inode has to blocks
 
 // Inode modes
 #define IREG  0x8000   // regular file
@@ -39,30 +38,29 @@ typedef struct {
     uint16_t mode;              // permissions / type
     uint16_t links_count;
     uint32_t size;              // in bytes
-    uint32_t atime;
-    uint32_t mtime;
-    uint32_t ctime;
+    uint32_t atime;             // access
+    uint32_t mtime;             // modify
+    uint32_t ctime;             // create
 
     uint32_t direct[DIRECT_PTRS];   // 12 direct block pointers
     uint32_t indirect;              // single indirect
     uint32_t double_indirect;       // double indirect
 } Inode;
 
-FILE *disk;  // your "virtual disk" file
-Superblock sb;
+uint8_t block_bitmap[BLOCK_SIZE]; // global variable simulates bitmap "kept in cache"
+uint8_t inode_bitmap[MAX_INODES]; // global variable simulates bitmap "kept in cache"
 
 void format_disk(const char *filename, uint32_t num_blocks);
-
-uint8_t block_bitmap[BLOCK_SIZE];
-uint8_t inode_bitmap[MAX_INODES];
 
 void initialize_bitmap();
 
 typedef struct {
-    Superblock sb;
-    FILE *disk;
+    Superblock sb;     // global variable simulates superblock "kept in cache"
+    FILE *disk;        // "virtual disk" file
     char mounted;
 } FileSystem;
+
+FileSystem fs;
 
 int update_inode_bitmap(uint32_t inode_num, uint8_t used);
 

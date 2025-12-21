@@ -8,25 +8,25 @@
 #include <string.h>
 
 void read_block(uint32_t block_num, void *buf) {
-    fseek(disk, block_num * BLOCK_SIZE, SEEK_SET);
-    fread(buf, BLOCK_SIZE, 1, disk);
+    fseek(fs.disk, block_num * BLOCK_SIZE, SEEK_SET);
+    fread(buf, BLOCK_SIZE, 1, fs.disk);
 }
 
 void write_block(uint32_t block_num, const void *buf) {
-    fseek(disk, block_num * BLOCK_SIZE, SEEK_SET);
-    fwrite(buf, BLOCK_SIZE, 1, disk);
+    fseek(fs.disk, block_num * BLOCK_SIZE, SEEK_SET);
+    fwrite(buf, BLOCK_SIZE, 1, fs.disk);
 }
 
 void sync_superblock() {
-    fseek(disk, 0, SEEK_SET);
-    fwrite(&sb, sizeof(sb), 1, disk);
+    fseek(fs.disk, 0, SEEK_SET);
+    fwrite(&fs.sb, sizeof(fs.sb), 1, fs.disk);
 }
 
 int alloc_block() {
-    for (int i = sb.data_block_start; i < sb.total_blocks; i++) {
+    for (int i = fs.sb.data_block_start; i < fs.sb.total_blocks; i++) {
         if (block_bitmap[i] == 0) {
             update_block_bitmap(i , 1);
-            sb.free_blocks -= 1;
+            fs.sb.free_blocks -= 1;
             sync_superblock();
             return i;
         }
@@ -35,10 +35,10 @@ int alloc_block() {
 }
 
 int alloc_inode() {
-    for (int i = 0; i < sb.total_inodes; i++) {
+    for (int i = 0; i < fs.sb.total_inodes; i++) {
         if (inode_bitmap[i] == 0) {
             update_inode_bitmap(i, 1);
-            sb.free_inodes -= 1;
+            fs.sb.free_inodes -= 1;
             sync_superblock();
             return i;
         }
@@ -48,13 +48,13 @@ int alloc_inode() {
 
 void free_block(uint32_t b) {
     block_bitmap[b] = 0;
-    sb.free_blocks += 1;
+    fs.sb.free_blocks += 1;
     sync_superblock();
 }
 
 void free_inode(uint32_t i) {
     inode_bitmap[i] = 0;
-    sb.free_inodes += 1;
+    fs.sb.free_inodes += 1;
     sync_superblock();
 }
 
@@ -84,12 +84,12 @@ int write_inode(uint32_t inode_num, Inode *new_inode) {
     int inode_per_block = BLOCK_SIZE / sizeof(Inode);
 
     uint32_t inode_idx = inode_num % inode_per_block;
-    uint32_t block_idx = inode_num / inode_per_block + sb.inode_start;
+    uint32_t block_idx = inode_num / inode_per_block + fs.sb.inode_start;
 
     uint32_t offset = block_idx * BLOCK_SIZE + inode_idx * sizeof(Inode);
 
-    fseek(disk, offset, SEEK_SET);
-    fwrite(new_inode, sizeof(Inode), 1, disk);
+    fseek(fs.disk, offset, SEEK_SET);
+    fwrite(new_inode, sizeof(Inode), 1, fs.disk);
 
     return 0;
 }
@@ -98,12 +98,12 @@ int read_inode(uint32_t inode_num, Inode *out_inode) {
     int inode_per_block = BLOCK_SIZE / sizeof(Inode);
 
     uint32_t inode_idx = inode_num % inode_per_block;
-    uint32_t block_idx = inode_num / inode_per_block + sb.inode_start;
+    uint32_t block_idx = inode_num / inode_per_block + fs.sb.inode_start;
 
     uint32_t offset = block_idx * BLOCK_SIZE + inode_idx * sizeof(Inode);
 
-    fseek(disk, offset, SEEK_SET);
-    fread(out_inode, sizeof(Inode), 1, disk);
+    fseek(fs.disk, offset, SEEK_SET);
+    fread(out_inode, sizeof(Inode), 1, fs.disk);
 
     return 0;
 }

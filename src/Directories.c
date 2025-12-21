@@ -20,8 +20,8 @@ long dir_lookup(uint32_t dir_num, char *entry_name) {
             for (uint32_t j = 0; j < BLOCK_SIZE/sizeof(DirEntry); j++) {
 
                 DirEntry entry;
-                fseek(disk, block_num * BLOCK_SIZE + j * sizeof(DirEntry), SEEK_SET);
-                fread(&entry, sizeof(DirEntry), 1, disk);
+                fseek(fs.disk, block_num * BLOCK_SIZE + j * sizeof(DirEntry), SEEK_SET);
+                fread(&entry, sizeof(DirEntry), 1, fs.disk);
 
                 if (entry.inode_num == 0 || entry.name[0] == '\0') continue;
 

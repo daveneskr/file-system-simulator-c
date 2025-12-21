@@ -9,5 +9,5 @@
 int main(void) {
     format_disk("FS.bin", 10);
 
-    fclose(disk);
+    fclose(fs.disk);
 }

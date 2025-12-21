@@ -7,8 +7,8 @@
 #include <stdlib.h>
 
 void format_disk(const char *filename, uint32_t num_blocks) {
-    disk = fopen(filename, "wb+");
-    if (!disk) {
+    fs.disk = fopen(filename, "wb+");
+    if (!fs.disk) {
         perror("fopen");
         exit(1);
     }
@@ -16,24 +16,24 @@ void format_disk(const char *filename, uint32_t num_blocks) {
     // Step 1: zero-fill the disk
     uint8_t zero_block[BLOCK_SIZE] = {0};
     for (uint32_t i = 0; i < num_blocks; i++) {
-        fwrite(zero_block, BLOCK_SIZE, 1, disk);
+        fwrite(zero_block, BLOCK_SIZE, 1,fs.disk);
     }
 
     // Step 2: initialize superblock
-    sb.total_blocks = num_blocks;
-    sb.block_size = BLOCK_SIZE;
-    sb.total_inodes = MAX_INODES;
-    sb.free_blocks = num_blocks - 7;    // 7 reserved
-    sb.free_inodes = MAX_INODES - 1;    // root inode used
-    sb.root_inode = 0;
-    sb.block_bitmap_start = 1;
-    sb.inode_bitmap_start = 2;
-    sb.inode_start = 3;
-    sb.data_block_start = 6;
+   fs.sb.total_blocks = num_blocks;
+   fs.sb.block_size = BLOCK_SIZE;
+   fs.sb.total_inodes = MAX_INODES;
+   fs.sb.free_blocks = num_blocks - 7;    // 7 reserved
+   fs.sb.free_inodes = MAX_INODES - 1;    // root inode used
+   fs.sb.root_inode = 0;
+   fs.sb.block_bitmap_start = 1;
+   fs.sb.inode_bitmap_start = 2;
+   fs.sb.inode_start = 3;
+   fs.sb.data_block_start = 6;
 
     // Step 3: write superblock at block 0
-    fseek(disk, 0, SEEK_SET);
-    fwrite(&sb, sizeof(Superblock), 1, disk);
+    fseek(fs.disk, 0, SEEK_SET);
+    fwrite(&fs.sb, sizeof(Superblock), 1,fs.disk);
 
     initialize_bitmap();
 
@@ -55,20 +55,20 @@ void initialize_bitmap() {
 
 int update_inode_bitmap(uint32_t inode_num, uint8_t used) {
     inode_bitmap[inode_num] = used;
-    uint32_t offset = sb.inode_bitmap_start * BLOCK_SIZE + inode_num;
+    uint32_t offset =fs.sb.inode_bitmap_start * BLOCK_SIZE + inode_num;
 
-    fseek(disk, offset, SEEK_SET);
-    fwrite(&used, 1, 1, disk);
+    fseek(fs.disk, offset, SEEK_SET);
+    fwrite(&used, 1, 1,fs.disk);
 
     return 0;
 }
 
 int update_block_bitmap(uint32_t block_num, uint8_t used) {
     block_bitmap[block_num] = used;
-    uint32_t offset = sb.block_bitmap_start * BLOCK_SIZE + block_num;
+    uint32_t offset =fs.sb.block_bitmap_start * BLOCK_SIZE + block_num;
 
-    fseek(disk, offset, SEEK_SET);
-    fwrite(&used, 1, 1, disk);
+    fseek(fs.disk, offset, SEEK_SET);
+    fwrite(&used, 1, 1,fs.disk);
 
     return 0;
 }
