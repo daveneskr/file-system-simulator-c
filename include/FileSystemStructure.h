@@ -50,10 +50,6 @@ typedef struct {
 uint8_t block_bitmap[BLOCK_SIZE]; // global variable simulates bitmap "kept in cache"
 uint8_t inode_bitmap[MAX_INODES]; // global variable simulates bitmap "kept in cache"
 
-void format_disk(const char *filename, uint32_t num_blocks);
-
-void initialize_bitmap();
-
 typedef struct {
     Superblock sb;     // global variable simulates superblock "kept in cache"
     FILE *disk;        // "virtual disk" file
@@ -61,6 +57,10 @@ typedef struct {
 } FileSystem;
 
 FileSystem fs;
+
+void format_disk(const char *filename, uint32_t num_blocks);
+
+void initialize_bitmap();
 
 int update_inode_bitmap(uint32_t inode_num, uint8_t used);
 

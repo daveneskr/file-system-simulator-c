@@ -17,23 +17,32 @@ void write_block(uint32_t block_num, const void *buf) {
     fwrite(buf, BLOCK_SIZE, 1, fs.disk);
 }
 
+// writes current superblock state stored in cache to disk
 void sync_superblock() {
-    fseek(fs.disk, 0, SEEK_SET);
-    fwrite(&fs.sb, sizeof(fs.sb), 1, fs.disk);
+    fseek(fs.disk, 0, SEEK_SET); // set file pointer to first block
+    fwrite(&fs.sb, sizeof(fs.sb), 1, fs.disk); // write superblock
 }
 
+// finds free block, allocates it and returns the block number
 int alloc_block() {
-    for (int i = fs.sb.data_block_start; i < fs.sb.total_blocks; i++) {
-        if (block_bitmap[i] == 0) {
-            update_block_bitmap(i , 1);
-            fs.sb.free_blocks -= 1;
-            sync_superblock();
-            return i;
+    // check if there are any free blocks
+    if (fs.sb.free_blocks > 0) {
+        // start at data blocks, as before are taken at disk formating
+        // iterate through bitmap
+        for (int i = fs.sb.data_block_start; i < fs.sb.total_blocks; i++) {
+            // check if block free
+            if (block_bitmap[i] == 0) {
+                update_block_bitmap(i , 1); // mark used in bitmap
+                fs.sb.free_blocks -= 1;          // decrement num of free blocks
+                sync_superblock();
+                return i;   // block number
+            }
         }
     }
-    return -1;
+    return -1; // if no free blocks found
 }
 
+// finds free inode, allocates it and returns the inode number
 int alloc_inode() {
     for (int i = 0; i < fs.sb.total_inodes; i++) {
         if (inode_bitmap[i] == 0) {

@@ -24,8 +24,8 @@ void format_disk(const char *filename, uint32_t num_blocks) {
    fs.sb.block_size = BLOCK_SIZE;
    fs.sb.total_inodes = MAX_INODES;
    fs.sb.free_blocks = num_blocks - 7;    // 7 reserved
-   fs.sb.free_inodes = MAX_INODES - 1;    // root inode used
-   fs.sb.root_inode = 0;
+   fs.sb.free_inodes = MAX_INODES;
+   fs.sb.root_inode = create_inode(IDIR | IRUSR | IWUSR | IXUSR); // initialize root inode
    fs.sb.block_bitmap_start = 1;
    fs.sb.inode_bitmap_start = 2;
    fs.sb.inode_start = 3;
@@ -36,9 +36,6 @@ void format_disk(const char *filename, uint32_t num_blocks) {
     fwrite(&fs.sb, sizeof(Superblock), 1,fs.disk);
 
     initialize_bitmap();
-
-    // IDIR | IRUSR | IWUSR | IXUSR
-    uint32_t root_ino = create_inode(1);
 
     printf("Disk formatted: %s (%u blocks)\n", filename, num_blocks);
 }
@@ -54,9 +51,12 @@ void initialize_bitmap() {
 }
 
 int update_inode_bitmap(uint32_t inode_num, uint8_t used) {
-    inode_bitmap[inode_num] = used;
-    uint32_t offset =fs.sb.inode_bitmap_start * BLOCK_SIZE + inode_num;
+    inode_bitmap[inode_num] = used;   // mark inode in bitmap
 
+    // calc correct block + inode_num
+    uint32_t offset = fs.sb.inode_bitmap_start * BLOCK_SIZE + inode_num;
+
+    // set file pointer and write update
     fseek(fs.disk, offset, SEEK_SET);
     fwrite(&used, 1, 1,fs.disk);
 
@@ -64,9 +64,12 @@ int update_inode_bitmap(uint32_t inode_num, uint8_t used) {
 }
 
 int update_block_bitmap(uint32_t block_num, uint8_t used) {
-    block_bitmap[block_num] = used;
+    block_bitmap[block_num] = used;  // mark block in bitmap
+
+    // calc correct block + block_num
     uint32_t offset =fs.sb.block_bitmap_start * BLOCK_SIZE + block_num;
 
+    // set file pointer to offset adn write update
     fseek(fs.disk, offset, SEEK_SET);
     fwrite(&used, 1, 1,fs.disk);
 
