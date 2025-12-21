@@ -19,7 +19,7 @@ void free_block(uint32_t b);
 
 void free_inode(uint32_t i);
 
-uint32_t create_inode(uint16_t mode);
+int create_inode(uint16_t mode);
 
 int write_inode(uint32_t inode_num, Inode *new_inode);
 

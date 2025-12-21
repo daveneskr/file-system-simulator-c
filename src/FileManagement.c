@@ -33,7 +33,7 @@ int alloc_block() {
             // check if block free
             if (block_bitmap[i] == 0) {
                 update_block_bitmap(i , 1); // mark used in bitmap
-                fs.sb.free_blocks -= 1;          // decrement num of free blocks
+                fs.sb.free_blocks--;          // decrement num of free blocks
                 sync_superblock();
                 return i;   // block number
             }
@@ -44,38 +44,42 @@ int alloc_block() {
 
 // finds free inode, allocates it and returns the inode number
 int alloc_inode() {
-    for (int i = 0; i < fs.sb.total_inodes; i++) {
-        if (inode_bitmap[i] == 0) {
-            update_inode_bitmap(i, 1);
-            fs.sb.free_inodes -= 1;
-            sync_superblock();
-            return i;
+    // check if there are any free inodes
+    if (fs.sb.free_inodes > 0) {
+        // iterate through bitmap
+        for (int i = 0; i < fs.sb.total_inodes; i++) {
+            // check if inode free
+            if (inode_bitmap[i] == 0) {
+                update_inode_bitmap(i, 1); // mark inode as used
+                fs.sb.free_inodes--; // decrement amount of free inodes
+                sync_superblock();
+                return i;
+            }
         }
     }
-    return -1;
+    return -1; // if no free inodes are found
 }
 
 void free_block(uint32_t b) {
-    block_bitmap[b] = 0;
-    fs.sb.free_blocks += 1;
+    block_bitmap[b] = 0; // mark block free
+    fs.sb.free_blocks++; // increment amount of free blocks
     sync_superblock();
 }
 
 void free_inode(uint32_t i) {
-    inode_bitmap[i] = 0;
-    fs.sb.free_inodes += 1;
+    inode_bitmap[i] = 0; // mark inode free
+    fs.sb.free_inodes++; // increment amount of free inodes
     sync_superblock();
 }
 
-uint32_t create_inode(uint16_t mode)
+int create_inode(uint16_t mode)
 {
-    int inode_num = alloc_inode();
-    if (inode_num == -1)
-    {
-        return 0;
-    }
+    int inode_num = alloc_inode(); // allocate new inode and store num
+
+    if (inode_num == -1) return -1; // if alloc unsuccessful
+
     Inode new_inode;
-    memset(&new_inode, 0, sizeof(Inode));
+    memset(&new_inode, 0, sizeof(Inode)); // set inode fields to zero
 
     new_inode.mode = mode;
 
@@ -84,6 +88,7 @@ uint32_t create_inode(uint16_t mode)
     new_inode.mtime = now;
     new_inode.ctime = now;
 
+    // write inode to inode table
     write_inode(inode_num, &new_inode);
 
     return inode_num;
