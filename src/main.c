@@ -4,6 +4,8 @@
 
 /* TO DO:
    - add argument validation
+   - optimise dir lookup
+     - condence dir contents?
 */
 
 int main(void) {
