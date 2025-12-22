@@ -7,17 +7,13 @@
 #include "FileSystemStructure.h"
 #include <stdint.h>
 
-#define IFMT 0xF000
-
 #define NAME_MAX 32
 
 typedef struct {
     uint32_t inode_num;
-    char name[NAME_MAX];
+    char name[NAME_MAX]; // entry name, user visible
 } DirEntry;
 
 long dir_lookup(uint32_t dir_num, char *entry_name);
-
-void test_dir_lookup();
 
 #endif //DIRECTORIES_H

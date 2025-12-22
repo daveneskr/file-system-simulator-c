@@ -95,11 +95,15 @@ int create_inode(uint16_t mode)
 }
 
 int write_inode(uint32_t inode_num, Inode *new_inode) {
-    int inode_per_block = BLOCK_SIZE / sizeof(Inode);
+    int inode_per_block = BLOCK_SIZE / sizeof(Inode); // num of inodes in a block
 
+    // index of the inode in the respective block
     uint32_t inode_idx = inode_num % inode_per_block;
+
+    // the block in which the inode is
     uint32_t block_idx = inode_num / inode_per_block + fs.sb.inode_start;
 
+    // scale to bytes of the disk
     uint32_t offset = block_idx * BLOCK_SIZE + inode_idx * sizeof(Inode);
 
     fseek(fs.disk, offset, SEEK_SET);
@@ -109,11 +113,15 @@ int write_inode(uint32_t inode_num, Inode *new_inode) {
 }
 
 int read_inode(uint32_t inode_num, Inode *out_inode) {
-    int inode_per_block = BLOCK_SIZE / sizeof(Inode);
+    int inode_per_block = BLOCK_SIZE / sizeof(Inode); // num of inodes in a block
 
+    // index of the inode in the respective block
     uint32_t inode_idx = inode_num % inode_per_block;
+
+    // the block in which the inode is
     uint32_t block_idx = inode_num / inode_per_block + fs.sb.inode_start;
 
+    // scale to bytes of the disk
     uint32_t offset = block_idx * BLOCK_SIZE + inode_idx * sizeof(Inode);
 
     fseek(fs.disk, offset, SEEK_SET);

@@ -8,10 +8,11 @@
 #include <string.h>
 
 long dir_lookup(uint32_t dir_num, char *entry_name) {
+    // read dir's inode to cache
     Inode dir;
     read_inode(dir_num, &dir);
 
-    // find each block
+    // loop through each block the inode points to
     for (uint32_t i = 0; i < DIRECT_PTRS; i++) {
         uint32_t block_num = dir.direct[i];
 
@@ -19,17 +20,20 @@ long dir_lookup(uint32_t dir_num, char *entry_name) {
         if (block_num != 0) {
             for (uint32_t j = 0; j < BLOCK_SIZE/sizeof(DirEntry); j++) {
 
+                // read dir entry
                 DirEntry entry;
                 fseek(fs.disk, block_num * BLOCK_SIZE + j * sizeof(DirEntry), SEEK_SET);
                 fread(&entry, sizeof(DirEntry), 1, fs.disk);
 
+                // check if entry exists
                 if (entry.inode_num == 0 || entry.name[0] == '\0') continue;
 
+                // check if matches key
                 if (strcmp(entry.name, entry_name) == 0) {
-                    return entry.inode_num;
+                    return entry.inode_num; // if yes, entry found
                 }
             }
         }
     }
-    return -1;
+    return -1; // no entry found
 }
