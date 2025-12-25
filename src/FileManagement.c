@@ -94,6 +94,23 @@ int create_inode(uint16_t mode)
     return inode_num;
 }
 
+int alloc_direct_inode_block(uint32_t inum) {
+    Inode inode;
+    read_inode(inum, &inode);
+
+    for (int i = 0; i < DIRECT_PTRS; i++) {
+        if (inode.direct[i] == 0) {
+            int new_block = alloc_block();
+            if (new_block != -1) {
+                // allocate new block and validate
+                inode.direct[i] = new_block; // store new blocks address
+                return new_block;
+            }
+            return -1;
+        }
+    }
+}
+
 int write_inode(uint32_t inode_num, Inode *new_inode) {
     int inode_per_block = BLOCK_SIZE / sizeof(Inode); // num of inodes in a block
 

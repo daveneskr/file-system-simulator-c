@@ -25,4 +25,6 @@ int write_inode(uint32_t inode_num, Inode *new_inode);
 
 int read_inode(uint32_t inode_num, Inode *out_inode);
 
+int alloc_direct_inode_block(uint32_t inum);
+
 #endif //FILEMANAGEMENT_H

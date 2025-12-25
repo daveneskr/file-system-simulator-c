@@ -7,7 +7,7 @@
 
 #include <string.h>
 
-long dir_lookup(uint32_t dir_num, char *entry_name) {
+long dir_lookup(uint32_t dir_num, const char *entry_name) {
     // read dir's inode to cache
     Inode dir;
     read_inode(dir_num, &dir);
@@ -22,11 +22,11 @@ long dir_lookup(uint32_t dir_num, char *entry_name) {
 
                 // read dir entry
                 DirEntry entry;
-                fseek(fs.disk, block_num * BLOCK_SIZE + j * sizeof(DirEntry), SEEK_SET);
-                fread(&entry, sizeof(DirEntry), 1, fs.disk);
+                uint32_t offset = block_num * BLOCK_SIZE + sizeof(uint32_t) + j * sizeof(DirEntry);
+                read_dir_entry(offset, &entry);
 
                 // check if entry exists
-                if (entry.inode_num == 0 || entry.name[0] == '\0') continue;
+                if (entry.used == FREE) return -1; // end of dir entry array
 
                 // check if matches key
                 if (strcmp(entry.name, entry_name) == 0) {
@@ -36,4 +36,117 @@ long dir_lookup(uint32_t dir_num, char *entry_name) {
         }
     }
     return -1; // no entry found
+}
+
+long dir_add(uint32_t dir_inum, const char *name, uint32_t child_inum, uint8_t type) {
+
+    if (dir_lookup(dir_inum, name) != -1) return -1; // entry with this name already exists
+
+    DirEntry entry = {0};
+    entry.inode_num = child_inum;
+    entry.type = type;
+    entry.used = USED;
+    strncpy(entry.name, name, sizeof(entry.name)-1);
+
+    long dir_entry_address = alloc_dir_entry(dir_inum);
+
+    if (dir_entry_address == -1) return -1;
+
+    write_dir_entry(dir_entry_address, &entry);
+
+    Inode dir;
+    read_inode(dir_inum, &dir);
+
+    dir.size += sizeof(DirEntry);
+
+    write_inode(dir_inum, &dir);
+
+    return dir_entry_address;
+}
+
+// returns the !! disk relative !! index of next free DirEntry slot
+long alloc_dir_entry(uint32_t dir_inum) {
+    Inode dir;
+    read_inode(dir_inum, &dir);
+
+    // loop through each direct block
+    for (int i = 0; i < DIRECT_PTRS; i++) {
+        if (dir.direct[i] == 0) continue; // skip if block not allocated
+        if (dir_block_full(dir.direct[i])) continue; // skip if block full
+
+        // if block not full return mem address
+
+        long new_entry_address = dir.direct[i] * BLOCK_SIZE  // block number
+                + sizeof(uint32_t) // holds num of entries
+                + read_num_of_dir_entries(dir.direct[i]) * sizeof(DirEntry); // used block space
+
+        dir_block_update_count(dir.direct[i], INCREMENT);
+
+        return new_entry_address;
+    }
+
+    // if no free block found try to allocate new one
+    int bnum = alloc_direct_inode_block(dir_inum);
+    if (bnum > -1 ) {
+        // return DirEntry index 0
+        long new_entry_address = bnum * BLOCK_SIZE  // block number
+                + sizeof(uint32_t); // holds num of entries
+
+        dir_block_update_count(bnum, INCREMENT);
+
+        return new_entry_address;
+    }
+
+    return -1; // allocation failed
+}
+
+int read_dir_entry(uint32_t offset, DirEntry *entry) {
+    fseek(fs.disk, offset, SEEK_SET);
+    fread(entry, sizeof(DirEntry), 1, fs.disk);
+}
+
+int write_dir_entry(uint32_t offset, DirEntry *entry) {
+    fseek(fs.disk, offset, SEEK_SET);
+    fwrite(entry, sizeof(DirEntry), 1, fs.disk);
+}
+
+// returns true if all DirEntry's at that block are used
+int dir_block_full(uint32_t bnum) {
+    // get num of entries
+    uint32_t num_of_entries = read_num_of_dir_entries(bnum);
+
+    // check if it equals the theoretical maximum of entries in a block
+    if (num_of_entries == (BLOCK_SIZE - sizeof(uint32_t)) / sizeof(DirEntry)) return 1;
+    return 0;
+}
+
+// returns 1 if directory has no DirEntry's at that block
+int dir_block_empty(uint32_t bnum) {
+    uint32_t num_of_entries = read_num_of_dir_entries(bnum);
+
+    if (num_of_entries == 0) return 1;
+    return 0;
+}
+
+// returns number of used DirEnry's in the directory block
+uint32_t read_num_of_dir_entries(uint32_t bnum) {
+    uint32_t num_of_entries;
+    fseek(fs.disk, bnum * BLOCK_SIZE, SEEK_SET);
+    fread(&num_of_entries, sizeof(uint32_t), 1, fs.disk);
+    return num_of_entries;
+}
+
+// returns number of used DirEnry's in the directory block
+int write_num_of_dir_entries(uint32_t bnum, uint32_t count) {
+    fseek(fs.disk, bnum * BLOCK_SIZE, SEEK_SET);
+    fwrite(&count, sizeof(uint32_t), 1, fs.disk);
+    return 0;
+}
+
+// INCREMENT or DECREMENT dir entry count
+int dir_block_update_count(uint32_t bnum, int operation) {
+    uint32_t count = read_num_of_dir_entries(bnum);
+    count += operation;
+
+    write_num_of_dir_entries(bnum, count);
 }

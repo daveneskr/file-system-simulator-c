@@ -26,6 +26,12 @@ typedef struct
 
 #define DIRECT_PTRS 12  // number of direct pointers an inode has to blocks
 
+#define USED 1
+#define FREE 0
+
+#define INCREMENT 1
+#define DECREMENT (-1)
+
 // Inode modes
 #define IREG  0x8000   // regular file
 #define IDIR  0x4000   // directory
