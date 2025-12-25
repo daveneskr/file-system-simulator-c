@@ -6,6 +6,7 @@
 #define FILESYSTEMSTRUCTURE_H
 #include <stdint.h>
 #include <stdio.h>
+#include <time.h>
 
 #define BLOCK_SIZE 4096 // in bytes
 #define MAX_INODES 512
@@ -44,9 +45,9 @@ typedef struct {
     uint16_t mode;              // permissions / type
     uint16_t links_count;
     uint32_t size;              // in bytes
-    uint32_t atime;             // access
-    uint32_t mtime;             // modify
-    uint32_t ctime;             // create
+    time_t atime;             // access
+    time_t mtime;             // modify
+    time_t ctime;             // create
 
     uint32_t direct[DIRECT_PTRS];   // 12 direct block pointers
     uint32_t indirect;              // single indirect

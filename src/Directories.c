@@ -38,28 +38,35 @@ long dir_lookup(uint32_t dir_num, const char *entry_name) {
     return -1; // no entry found
 }
 
+// adds entry to dir
 long dir_add(uint32_t dir_inum, const char *name, uint32_t child_inum, uint8_t type) {
 
     if (dir_lookup(dir_inum, name) != -1) return -1; // entry with this name already exists
 
+    // initialize dir entry
     DirEntry entry = {0};
     entry.inode_num = child_inum;
     entry.type = type;
     entry.used = USED;
     strncpy(entry.name, name, sizeof(entry.name)-1);
 
+    // allocates dir space
     long dir_entry_address = alloc_dir_entry(dir_inum);
 
+    // validate allocation
     if (dir_entry_address == -1) return -1;
 
+    // write dir entry
     write_dir_entry(dir_entry_address, &entry);
 
+    // update inode
     Inode dir;
     read_inode(dir_inum, &dir);
-
     dir.size += sizeof(DirEntry);
-
     write_inode(dir_inum, &dir);
+
+    // increment entry count in block
+    dir_block_update_count(dir_entry_address / BLOCK_SIZE, INCREMENT);
 
     return dir_entry_address;
 }
@@ -80,8 +87,6 @@ long alloc_dir_entry(uint32_t dir_inum) {
                 + sizeof(uint32_t) // holds num of entries
                 + read_num_of_dir_entries(dir.direct[i]) * sizeof(DirEntry); // used block space
 
-        dir_block_update_count(dir.direct[i], INCREMENT);
-
         return new_entry_address;
     }
 
@@ -91,8 +96,6 @@ long alloc_dir_entry(uint32_t dir_inum) {
         // return DirEntry index 0
         long new_entry_address = bnum * BLOCK_SIZE  // block number
                 + sizeof(uint32_t); // holds num of entries
-
-        dir_block_update_count(bnum, INCREMENT);
 
         return new_entry_address;
     }

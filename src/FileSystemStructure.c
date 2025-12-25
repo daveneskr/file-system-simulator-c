@@ -25,7 +25,6 @@ void format_disk(const char *filename, uint32_t num_blocks) {
    fs.sb.total_inodes = MAX_INODES;
    fs.sb.free_blocks = num_blocks - 7;    // 7 reserved
    fs.sb.free_inodes = MAX_INODES;
-   fs.sb.root_inode = create_inode(IDIR | IRUSR | IWUSR | IXUSR); // initialize root inode
    fs.sb.block_bitmap_start = 1;
    fs.sb.inode_bitmap_start = 2;
    fs.sb.inode_start = 3;
@@ -36,6 +35,8 @@ void format_disk(const char *filename, uint32_t num_blocks) {
     fwrite(&fs.sb, sizeof(Superblock), 1,fs.disk);
 
     initialize_bitmap();
+
+    fs.sb.root_inode = create_inode(IDIR | IRUSR | IWUSR | IXUSR); // initialize root inode
 
     printf("Disk formatted: %s (%u blocks)\n", filename, num_blocks);
 }

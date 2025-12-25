@@ -83,7 +83,7 @@ int create_inode(uint16_t mode)
 
     new_inode.mode = mode;
 
-    uint32_t now = time(NULL);
+    time_t now = time(NULL);
     new_inode.atime = now;
     new_inode.mtime = now;
     new_inode.ctime = now;
@@ -104,6 +104,7 @@ int alloc_direct_inode_block(uint32_t inum) {
             if (new_block != -1) {
                 // allocate new block and validate
                 inode.direct[i] = new_block; // store new blocks address
+                write_inode(inum, &inode);
                 return new_block;
             }
             return -1;
