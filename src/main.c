@@ -5,6 +5,7 @@
 #include "../include/FileSystemStructure.h"
 #include "../include/Directories.h"
 #include "../include/Inode.h"
+#include <Files.h>
 
 /* TO DO:
    - add argument validation

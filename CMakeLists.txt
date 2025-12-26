@@ -13,6 +13,10 @@ add_library(fs_core
         src/FileManagement.c
         src/Directories.c
         src/Inode.c
+        src/Files.c
+        include/Files.h
+        src/Paths.c
+        include/Paths.h
 )
 
 target_include_directories(fs_core PUBLIC

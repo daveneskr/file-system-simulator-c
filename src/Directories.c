@@ -59,11 +59,16 @@ long dir_add(uint32_t dir_inum, const char *name, uint32_t child_inum, uint16_t 
     // write dir entry
     write_dir_entry(dir_entry_address, &entry);
 
+    // update entry inode
+    Inode child;
+    read_inode(child_inum, &child);
+    child.links_count++;
+    write_inode(child_inum, &child);
+
     // update inode
     Inode dir;
     read_inode(dir_inum, &dir);
     dir.size += sizeof(DirEntry);
-    dir.links_count++;
     write_inode(dir_inum, &dir);
 
     // increment entry count in block
