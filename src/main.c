@@ -4,6 +4,7 @@
 
 #include "../include/FileSystemStructure.h"
 #include "../include/Directories.h"
+#include "../include/Inode.h"
 
 /* TO DO:
    - add argument validation
@@ -12,7 +13,7 @@
 */
 
 int main(void) {
-    format_disk("FS.bin", 10);
+    format_disk("FS.bin", 20);
 
     fclose(fs.disk);
 }

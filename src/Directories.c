@@ -39,7 +39,7 @@ long dir_lookup(uint32_t dir_num, const char *entry_name) {
 }
 
 // adds entry to dir
-long dir_add(uint32_t dir_inum, const char *name, uint32_t child_inum, uint8_t type) {
+long dir_add(uint32_t dir_inum, const char *name, uint32_t child_inum, uint16_t type) {
 
     if (dir_lookup(dir_inum, name) != -1) return -1; // entry with this name already exists
 
@@ -63,6 +63,7 @@ long dir_add(uint32_t dir_inum, const char *name, uint32_t child_inum, uint8_t t
     Inode dir;
     read_inode(dir_inum, &dir);
     dir.size += sizeof(DirEntry);
+    dir.links_count++;
     write_inode(dir_inum, &dir);
 
     // increment entry count in block
@@ -96,6 +97,10 @@ long alloc_dir_entry(uint32_t dir_inum) {
         // return DirEntry index 0
         long new_entry_address = bnum * BLOCK_SIZE  // block number
                 + sizeof(uint32_t); // holds num of entries
+        Inode dir;
+        read_inode(dir_inum, &dir);
+        dir.size += sizeof(uint32_t); // header
+        write_inode(dir_inum, &dir);
 
         return new_entry_address;
     }
@@ -152,4 +157,64 @@ int dir_block_update_count(uint32_t bnum, int operation) {
     count += operation;
 
     write_num_of_dir_entries(bnum, count);
+}
+
+// make a new directory in parent, return 0 on success, -1 else
+int mkdir(uint32_t parent_inum, char *child) {
+    // check if parent is dir
+    if (!is_dir(parent_inum)) return -1;
+
+    int child_inum = create_dir(IDIR|IRUSR|IWUSR|IXUSR);
+
+    // add parent as child second entry '..'
+    if (dir_add(child_inum, "..", parent_inum, IDIR) == -1) return -1;
+
+    // add child as directory entry to parent
+    if (dir_add(parent_inum, child, child_inum, IDIR) == -1) return -1;
+
+    return child_inum; // success
+}
+
+// returns 1 if inode is directory, 0 else
+int is_dir(uint32_t inum) {
+    Inode inode;
+    read_inode(inum, &inode);
+
+    // keep only first 4 bits and compare to IDIR
+    return (inode.mode & 0xF000) == IDIR ? 1 : 0;
+}
+
+// alloc new dir inode and adds itself as first entry
+int create_dir(uint16_t mode) {
+    // allocate new dir full control inode
+    int inum = create_inode(mode);
+    if (inum == -1) return -1;
+
+    // add itself as first entry
+    dir_add(inum, ".", inum, IDIR);
+
+    return inum;
+}
+
+int dir_list(uint32_t dir_inum) {
+    Inode dir;
+    read_inode(dir_inum, &dir);
+
+    for (int i = 0; i < DIRECT_PTRS; i++) {
+        // skip if block not alloc
+        if (dir.direct[i] == 0) continue;
+        // skip if block emtpy
+        if (dir_block_empty(dir.direct[i])) continue;
+
+        uint32_t offset = sizeof(uint32_t) + dir.direct[i] * BLOCK_SIZE;
+
+        DirEntry entry;
+        read_dir_entry(offset, &entry);
+
+        while (entry.used == USED) {
+            printf("%s\n", entry.name);
+            offset += sizeof(DirEntry);
+            read_dir_entry(offset, &entry);
+        }
+    }
 }

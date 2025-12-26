@@ -11,9 +11,9 @@
 
 typedef struct {
     uint32_t inode_num;
-    uint8_t type; // IDIR or IREG
+    uint16_t type; // IDIR or IREG
     uint8_t used; // USED or FREE
-    uint16_t _pad; // rounds bytes
+    uint8_t _pad; // rounds bytes
     char name[NAME_MAX]; // entry name, user visible
 } DirEntry;
 
@@ -29,10 +29,18 @@ uint32_t read_num_of_dir_entries(uint32_t bnum);
 
 long alloc_dir_entry(uint32_t dir_inum);
 
-long dir_add(uint32_t dir_inum, const char *name, uint32_t child_inum, uint8_t type);
+long dir_add(uint32_t dir_inum, const char *name, uint32_t child_inum, uint16_t type);
 
 int write_num_of_dir_entries(uint32_t bnum, uint32_t count);
 
 int dir_block_update_count(uint32_t bnum, int operation);
+
+int is_dir(uint32_t inum);
+
+int create_dir(uint16_t mode);
+
+int mkdir(uint32_t parent_inum, char *child);
+
+int dir_list(uint32_t dir_inum);
 
 #endif //DIRECTORIES_H

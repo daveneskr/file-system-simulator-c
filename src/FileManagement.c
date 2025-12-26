@@ -72,6 +72,7 @@ void free_inode(uint32_t i) {
     sync_superblock();
 }
 
+// returns inum of the new inode or -1 if failed
 int create_inode(uint16_t mode)
 {
     int inode_num = alloc_inode(); // allocate new inode and store num

@@ -12,6 +12,7 @@ add_library(fs_core
         src/FileSystemStructure.c
         src/FileManagement.c
         src/Directories.c
+        src/Inode.c
 )
 
 target_include_directories(fs_core PUBLIC
@@ -19,7 +20,8 @@ target_include_directories(fs_core PUBLIC
 )
 
 # Your main program
-add_executable(fs_cli src/main.c)
+add_executable(fs_cli src/main.c
+        include/Inode.h)
 target_link_libraries(fs_cli PRIVATE fs_core)
 
 # Tests

@@ -6,6 +6,8 @@
 
 #include <stdlib.h>
 
+#include "Inode.h"
+
 void format_disk(const char *filename, uint32_t num_blocks) {
     fs.disk = fopen(filename, "wb+");
     if (!fs.disk) {
@@ -36,7 +38,7 @@ void format_disk(const char *filename, uint32_t num_blocks) {
 
     initialize_bitmap();
 
-    fs.sb.root_inode = create_inode(IDIR | IRUSR | IWUSR | IXUSR); // initialize root inode
+    fs.sb.root_inode = initialize_root(); // initialize root inode
 
     printf("Disk formatted: %s (%u blocks)\n", filename, num_blocks);
 }
